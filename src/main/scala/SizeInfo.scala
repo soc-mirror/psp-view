@@ -118,7 +118,7 @@ final class SizeInfoOperations(val lhs: SizeInfo) extends AnyVal {
     case x: Atomic      => x
   }
 
-  private def preciseSliceSize(size: Int, start: Int, end: Int): Size = (
+  private def preciseSliceSize(size: Long, start: Long, end: Long): Size = (
     if (start < 0) preciseSliceSize(size, 0, end)
     else if (size <= start || end <= start) Size(0)
     else if (end < size) Size(end - start)
@@ -126,13 +126,13 @@ final class SizeInfoOperations(val lhs: SizeInfo) extends AnyVal {
   )
 
   def slice(range: Interval): SizeInfo = slice(range.start, range.end)
-  def slice(start: Int, end: Int): SizeInfo = lhs match {
+  def slice(start: Long, end: Long): SizeInfo = lhs match {
     case Precise(Size(n))                     => Precise(preciseSliceSize(n, start, end))
     case Bounded(Size(lo), Precise(Size(hi))) => bounded(preciseSliceSize(lo, start, end), Precise(preciseSliceSize(hi, start, end)))
     case Bounded(Size(lo), Infinite)          => bounded(preciseSliceSize(lo, start, end), Precise(preciseSliceSize(Int.MaxValue, start, end)))
     case Infinite                             => Precise(preciseSliceSize(Int.MaxValue, start, end))
   }
-  def precisely: Option[Int] = lhs match { case Precise(Size(n)) => Some(n) ; case _ => None }
+  def precisely: Option[Long] = lhs match { case Precise(Size(n)) => Some(n) ; case _ => None }
 
   // def +(amount: Size): Precise = Precise(size + amount)
   // def -(amount: Size): Precise = Precise(size - amount)

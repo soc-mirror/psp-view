@@ -11,7 +11,7 @@ final class PspInt(val self: Int) extends AnyVal {
   def hex: String    = java.lang.Integer.toHexString(self)
   def octal: String  = java.lang.Integer.toOctalString(self)
 
-  def until(end: Int): IntRange        = IntRange.until(self, end)
-  def to(end: Int): IntRange           = IntRange.to(self, end)
+  def until(end: Int): LongRange        = LongRange.until(self, end)
+  def to(end: Int): LongRange           = LongRange.to(self, end)
   def times[A](body: => A): Foreach[A] = Indexed.fill(self)(body)
 }

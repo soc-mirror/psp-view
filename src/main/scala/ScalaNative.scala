@@ -30,7 +30,7 @@ final class ScalaNative[+A](val xs: Iterable[A], val counter: Counter) extends E
   def labeled(label: String): MapTo[A]               = this
   def reverse: MapTo[A]                              = xs.reverse
   def sized(size: psp.core.Size): MapTo[A]           = this
-  def slice(range: psp.core.Interval): MapTo[A]      = xs.slice(range.start, range.end)
+  def slice(range: psp.core.Interval): MapTo[A]      = xs.slice(range.start.toInt, range.end.toInt)
   def withFilter(p: A => Boolean): MapTo[A]          = xs filter p
 
   override def toString = xs.shortClass

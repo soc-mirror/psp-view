@@ -19,17 +19,17 @@ abstract class IndexedImpl[+A](val size: Size) extends Indexed[A] {
 object StringIsIndexable extends IndexableImpl[String, Indexed, Char] {
   def convert(repr: String): Indexed[Char]     = Indexed pure repr
   def length(repr: String): Size               = Size(repr.length)
-  def elemAt(repr: String)(index: Index): Char = repr charAt index
+  def elemAt(repr: String)(index: Index): Char = repr charAt index.toInt
 }
 final class ArrayIsIndexable[A] extends IndexableImpl[Array[A], Indexed, A] {
   def convert(repr: Array[A]): Indexed[A]     = Indexed pure repr
   def length(repr: Array[A]): Size            = Size(repr.length)
-  def elemAt(repr: Array[A])(index: Index): A = repr(index)
+  def elemAt(repr: Array[A])(index: Index): A = repr(index.toInt)
 }
 final class IndexedSeqIsIndexable[CC[X] <: IndexedSeq[X], A] extends IndexableImpl[CC[A], CC, A] {
   def convert(repr: CC[A]): CC[A]          = repr
   def length(repr: CC[A]): Size            = Size(repr.length)
-  def elemAt(repr: CC[A])(index: Index): A = repr(index)
+  def elemAt(repr: CC[A])(index: Index): A = repr(index.toInt)
 }
 final class PspIndexedIsIndexable[A] extends IndexableImpl[Indexed[A], Indexed, A] {
   def convert(repr: Indexed[A]): Indexed[A]     = repr

@@ -16,11 +16,11 @@ final class PspStringOps(val repr: String) extends AnyVal with Indexed[Char] {
   def toLines: Indexed[String] = split(Regex(EOL))
 
   def isDefinedAt(index: Index): Boolean = 0 <= index && index < repr.length
-  def foreach(f: Char => Unit): Unit = size.toInterval foreach (i => f(repr charAt i))
+  def foreach(f: Char => Unit): Unit = size.toInterval foreach (i => f(repr charAt i.toInt))
   def split(re: Regex): Indexed[String] = re splits repr
   def contains(ch: Char): Boolean = (repr indexOf ch) >= 0
   def size = Size(repr.length)
-  def elemAt(index: Index): Char  = repr charAt index
+  def elemAt(index: Index): Char  = repr charAt index.toInt
   def format(args : Any*): String = java.lang.String.format(toString, args map unwrapArg: _*)
   def * (n: Int): String          = join("")((repr nTimes n).toSeq: _*)
 

@@ -16,7 +16,7 @@ trait HasContains[-A] extends Any {
 }
 trait Invariant[A] extends Any
 
-final class PureIndexed[+A](size: Size, indexFn: Int => A) extends IndexedImpl[A](size) {
+final class PureIndexed[+A](size: Size, indexFn: Long => A) extends IndexedImpl[A](size) {
   def elemAt(index: Index): A = indexFn(index)
 }
 
@@ -43,15 +43,15 @@ object Indexed {
     case _                   => pure(xs.toVector)
   }
 }
-object IntRange {
-  def until(start: Int, end: Int): IntRange = if (end < start) until(start, start) else new IntRange(start, end - 1, isInclusive = false)
-  def to(start: Int, last: Int): IntRange   = if (last < start) until(start, start) else new IntRange(start, last, isInclusive = true)
+object LongRange {
+  def until(start: Long, end: Long): LongRange = if (end < start) until(start, start) else new LongRange(start, end - 1, isInclusive = false)
+  def to(start: Long, last: Long): LongRange   = if (last < start) until(start, start) else new LongRange(start, last, isInclusive = true)
 }
 
-final class IntRange private (val start: Int, val last: Int, isInclusive: Boolean) extends IndexedImpl[Int](Size(last - start + 1)) with HasContains[Int] {
-  def contains(x: Int): Boolean = start <= x && x <= last
+final class LongRange private (val start: Long, val last: Long, isInclusive: Boolean) extends IndexedImpl[Long](Size(last - start + 1)) with HasContains[Long] {
+  def contains(x: Long): Boolean = start <= x && x <= last
   def isEmpty               = last < start
   def end                   = last + 1
-  def elemAt(i: Index): Int = start + i
+  def elemAt(i: Index): Long = start + i
   override def toString     = if (isInclusive) s"$start to $last" else s"$start until $end"
 }

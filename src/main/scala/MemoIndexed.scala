@@ -21,14 +21,14 @@ final class MemoIndexed[+A](xs: Foreach[A]) extends OpenIndexed[A] {
     case _    => true
   })
 
-  def isDefinedAt(i: Int): Boolean = (i >= 0) && {
+  def isDefinedAt(i: Long): Boolean = (i >= 0) && {
     thread
     while (i >= seen && hasNext) next()
     i < seen
   }
 
   def foreach(f: A => Unit): Unit = {
-    def loop(i: Int): Unit = {
+    def loop(i: Long): Unit = {
       if (isDefinedAt(i)) {
         f(elemAt(i))
         loop(i + 1)
@@ -36,8 +36,8 @@ final class MemoIndexed[+A](xs: Foreach[A]) extends OpenIndexed[A] {
     }
     loop(0)
   }
-  def apply(index: Int): A = elemAt(index)
-  def elemAt(index: Int): A = if (isDefinedAt(index)) memo(index) else sys.error(s"Out of range: $index")
+  def apply(index: Long): A = elemAt(index)
+  def elemAt(index: Long): A = if (isDefinedAt(index)) memo(index.toInt) else sys.error(s"Out of range: $index")
   def sizeInfo: SizeInfo = if (done) precise(seen) else precise(seen).atLeast
   override def toString = "<memo>"
 }
@@ -47,8 +47,8 @@ final class ZippedIndexed[+A, +B](left: OpenIndexed[A], right: OpenIndexed[B]) e
     var i = 0
     while (isDefinedAt(i)) { f(apply(i)) ; i += 1 }
   }
-  def isDefinedAt(index: Int): Boolean = (left isDefinedAt index) && (right isDefinedAt index)
-  def apply(index: Int): (A, B)        = elemAt(index)
-  def elemAt(index: Int): (A, B)       = (left elemAt index) -> (right elemAt index)
+  def isDefinedAt(index: Long): Boolean = (left isDefinedAt index) && (right isDefinedAt index)
+  def apply(index: Long): (A, B)        = elemAt(index)
+  def elemAt(index: Long): (A, B)       = (left elemAt index) -> (right elemAt index)
   def sizeInfo: SizeInfo               = left.sizeInfo min right.sizeInfo
 }

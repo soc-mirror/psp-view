@@ -4,18 +4,18 @@ package core
 final class CircularBuffer[A](capacity: Size) extends Foreach[A] {
   assert(capacity > Zero, capacity)
 
-  private[this] val buffer  = new Array[Any](capacity.value)
-  private[this] var pointer = 0
-  private[this] var seen    = 0
+  private[this] val buffer  = new Array[Any](capacity.toInt)
+  private[this] var pointer = 0L
+  private[this] var seen    = 0L
   private[this] def current = bufferAt(pointer)
 
-  private[this] def bufferAt(i: Int): A                   = buffer(i).castTo[A]
-  private[this] def bufferUpdate(offset: Int, x: A): Unit = buffer(bufferIndex(offset)) = x
-  private[this] def bufferIndex(index: Int): Int          = (pointer + index) % capacity.value
+  private[this] def bufferAt(i: Long): A                   = buffer(i.toInt).castTo[A]
+  private[this] def bufferUpdate(offset: Long, x: A): Unit = buffer(bufferIndex(offset).toInt) = x
+  private[this] def bufferIndex(index: Long): Long          = (pointer + index) % capacity.value
 
-  private[this] def indices: Indexed[Int] = if (isFull) size.toIndexed map bufferIndex else size.toIndexed
+  private[this] def indices: Indexed[Long] = if (isFull) size.toIndexed map bufferIndex else size.toIndexed
   private[this] def andThis(op: Unit): this.type = this
-  private[this] def intSize = size.value
+  private[this] def intSize = size.value.toInt
 
   def contents: Indexed[A] = indices map bufferAt toIndexed
   def size     = capacity min Size(seen)

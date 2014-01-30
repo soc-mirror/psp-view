@@ -22,7 +22,7 @@ final class Regex(val pattern: Pattern) extends AnyVal {
   def splits(input: CharSequence): Indexed[String]  = Indexed pure (pattern split input)
 
   def unapplySeq(input: CharSequence): Option[List[String]] = matcher(input) match {
-    case m if m.matches() => Some((1 to m.groupCount).toList map m.group)
+    case m if m.matches() => Some((1 to m.groupCount).toList map (i => m.group(i.toInt)))
     case _                => None
   }
 

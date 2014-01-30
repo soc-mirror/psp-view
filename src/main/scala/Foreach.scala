@@ -48,7 +48,7 @@ object Foreach extends ForeachImplicits {
   }
 
   final case class Times[A](size: Size, elem: A) extends Foreach[A] with HasPreciseSize {
-    @inline def foreach(f: A => Unit): Unit = 0 until size.value foreach (_ => f(elem))
+    @inline def foreach(f: A => Unit): Unit = 0L until size.value foreach (_ => f(elem))
     override def toString = pp"$elem x$size"
   }
 
@@ -61,9 +61,9 @@ object Foreach extends ForeachImplicits {
   def from(n: Long): Foreach[Long]     = unfold(n)(_ + 1)
   def from(n: BigInt): Foreach[BigInt] = unfold(n)(_ + 1)
 
-  def to(start: Int, last: Int): Foreach[Int]     = PspList fromForeach IntRange.to(start, last)
+  def to(start: Long, last: Long): Foreach[Long]  = PspList fromForeach LongRange.to(start, last)
   def const[A](elem: A): Constant[A]              = new Constant(elem)
-  def times[A](times: Int, elem: A): Foreach[A]   = Times(Size(times), elem)
+  def times[A](times: Long, elem: A): Foreach[A]   = Times(Size(times), elem)
 
   def unfold[A](start: A)(next: A => A): Unfold[A]   = Unfold[A](start)(next)
   def traversable[A](xs: Traversable[A]): Foreach[A] = xs match {
@@ -91,7 +91,7 @@ object Foreach extends ForeachImplicits {
 }
 
 final class ScalaIndexedSeqAsIndexed[+A](underlying: sc.IndexedSeq[A]) extends IndexedImpl[A](Size(underlying.size)) {
-  def elemAt(index: Index) = underlying(index)
+  def elemAt(index: Index) = underlying(index.toInt)
   override def toString = underlying.shortClass + " (wrapped)"
 }
 
