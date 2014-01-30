@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-compiler"              % scalaVersion.value,
            "jline" % "jline"                       % "2.11",
   "ch.qos.logback" % "logback-classic"             % "1.0.9",
-      "org.specs2" % "specs2-scalacheck_2.11.0-M7" % "2.3.6"             % "test"
+      "org.specs2" % "specs2-scalacheck_2.11.0-M8" % "2.3.7"             % "test"
 )
 
 lazy val root = project in file(".") settings (assemblySettings: _*) settings (
