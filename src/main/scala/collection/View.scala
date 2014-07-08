@@ -1,7 +1,8 @@
 package psp
-package core
+package collection
 
-import SizeInfo._
+import core._
+import core.SizeInfo._
 
 // TODO: Distinct, Reverse, Zip
 //
@@ -76,6 +77,8 @@ class ViewEnvironment[A0, Repr, CC0[X]](val repr: Repr) extends api.ViewEnvironm
     final def labeled(label: String): MapTo[A]      = LabeledView(this, label)
     final def sized(size: Size): MapTo[A]           = Sized(this, size)
     final def reverse: MapTo[A]                     = Reversed(this)
+    final def sliding(size: Size, step: Int): MapTo[Cluster[A]] = ???
+    final def groupBy[B](f: A => B): MapTo[(B, Cluster[A])]     = ???
 
     final def native(implicit pcb: Builds[A, Repr]): Repr      = force[Repr]
     final def force[That](implicit pcb: Builds[A, That]): That = pcb build this
@@ -140,7 +143,7 @@ class ViewEnvironment[A0, Repr, CC0[X]](val repr: Repr) extends api.ViewEnvironm
       case Dropped(xs, Size(n))  => unapply(xs) map { case (xs, range) => (xs, range drop n) }
       case Taken(xs, Size(n))    => unapply(xs) map { case (xs, range) => (xs, range take n) }
       case Sliced(xs, indices)   => unapply(xs) map { case (xs, range) => (xs, range slice indices) }
-      case _                     => xs.sizeInfo.precisely map (size => xs -> Interval(0, size))
+      case _                     => xs.sizeInfo.precisely map (size => (xs, Interval(0, size)))
     }
   }
 

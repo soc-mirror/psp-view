@@ -1,7 +1,9 @@
 package psp
+package collection
 package compat
 
 import psp.core._
+import psp.collection.Foreach
 
 /** Compatibility layer for wrapping scala views on their own terms.
  */
@@ -39,6 +41,9 @@ final class ScalaNative[+A](val xs: Iterable[A], val counter: Counter) extends a
   def sized(size: Size): MapTo[A]                    = this
   def slice(range: Interval): MapTo[A]               = xs.slice(range.start, range.end)
   def withFilter(p: Predicate[A]): MapTo[A]          = xs filter p
+  
+  def sliding(size: Size, step: Int): MapTo[Cluster[A]] = ???
+  def groupBy[B](f: A => B): MapTo[(B, Cluster[A])]     = ???
 
   def description = xs.shortClass
   def viewChain: List[api.View[_]] = this :: Nil

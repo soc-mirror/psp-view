@@ -1,5 +1,7 @@
 package psp
-package core
+package collection
+
+import psp.core._
 
 object PspList {
   implicit def newBuilder[A] : Builds[A, PspList[A]] = Builds(fromForeach)

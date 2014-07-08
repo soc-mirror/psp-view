@@ -2,7 +2,8 @@ package psp
 
 import scala.{ collection => sc }
 import sc.{ mutable => scm, immutable => sci }
-import psp.core.impl._
+import psp.core._
+import psp.collection.Foreach
 
 package core {
   abstract class PackageTraitsExceptShadowing extends PspUtility with PspTypes with PspHighPriority with PspUtilityMethods with JioCreation

@@ -2,6 +2,7 @@ package psp
 package core
 
 import java.{ lang => jl }
+import psp.collection.{ Direct, DirectLeaf, IntRange }
 
 final class Line(val text: String) extends AnyVal {
   override def toString = text
@@ -49,7 +50,7 @@ final class PspStringAsBytes(val repr: String) extends IndexedLeafImpl[Byte] {
   def elemAt(index: Index): Byte             = bytes(index)
   def isDefinedAt(index: Index): Boolean     = size containsIndex index
   @inline def foreach(f: Byte => Unit): Unit = Direct pure bytes foreach f
-  def contains(x: Byte): Boolean             = bytes contains x
+  def contains(x: Byte): Boolean             = ??? // bytes contains x
 
   override def toString = pp"String of $size bytes"
 }
@@ -61,7 +62,7 @@ final class PspStringAsChars(val repr: String) extends AnyVal with IndexedLeafIm
   def elemAt(index: Index): Char             = repr charAt index
   def isDefinedAt(index: Index): Boolean     = size containsIndex index
   @inline def foreach(f: Char => Unit): Unit = Direct pure chars foreach f
-  def contains(x: Char): Boolean             = chars contains x
+  def contains(x: Char): Boolean             = ??? // chars contains x
 
   override def toString = pp"String of $size chars"
 }

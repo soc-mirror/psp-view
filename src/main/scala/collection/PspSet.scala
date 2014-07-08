@@ -1,6 +1,7 @@
 package psp
-package core
+package collection
 
+import psp.core._
 import scala.collection.{ mutable, immutable }
 
 trait Extensional[+A] {

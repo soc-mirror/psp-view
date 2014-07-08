@@ -1,6 +1,8 @@
 package psp
 package core
 
+import psp.collection.Foreach
+
 trait Builds[-Elem, +To] {
   def +=(elem: Elem): this.type
   def ++=(xs: TraversableOnce[Elem]): this.type

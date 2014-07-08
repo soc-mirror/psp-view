@@ -1,7 +1,9 @@
 package psp
-package core
+package collection
 
-final class IndexedConversions[A](val xs: Direct[A]) extends AnyVal { }
+import psp.core._
+
+final class IndexedConversions[A](val xs: Direct[A]) extends AnyVal
 
 final class ExtraViewOperations[A, B, Repr, CC[X]](val xs: ViewEnvironment[A, Repr, CC]#View[B]) extends AnyVal {
   def mapWithIndex[C](f: (B, Int) => C)(implicit pcb: Builds[C, CC[C]]): ViewEnvironment[A, Repr, CC]#View[C] = {
@@ -76,7 +78,7 @@ final class ForeachOperations[A](val xs: Foreach[A]) extends AnyVal {
   def toScalaSet: Set[A]                            = to[Set]
   def toStream: Stream[A]                           = to[Stream]
   def toIterable: Iterable[A]                       = to[Iterable]
-  def toTraversable: Traversable[A]                 = ToScala(xs)
+  def toTraversable: Traversable[A]                 = compat.ToScala(xs)
   def trav: Traversable[A]                          = toTraversable
   def scalaIterator: Iterator[A]                    = toIterable.iterator
 

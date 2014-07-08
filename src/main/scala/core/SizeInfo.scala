@@ -78,8 +78,8 @@ object SizeInfo {
 
   def apply(x: Any): SizeInfo = x match {
     case x: HasSizeInfo       => x.sizeInfo
-    case xs: sc.IndexedSeq[_] => Size(xs.size)
-    case xs: Traversable[_]   => if (xs.isEmpty) Zero else NonEmpty
+    case xs: sc.IndexedSeq[_] => SizeInfo(Size(xs.size))
+    case xs: Traversable[_]   => if (xs.isEmpty) SizeInfo(Zero) else NonEmpty
     case _                    => Unknown
   }
   def bounded(lo: Size, hi: SizeInfo): SizeInfo = hi match {
@@ -99,16 +99,16 @@ object SizeInfo {
 
   object GenBounded {
     def unapply(x: SizeInfo): Option[(Size, Atomic)] = x match {
-      case Bounded(lo, hi) => Some(lo -> hi)
-      case Precise(n)      => Some(n -> Precise(n))
+      case Bounded(lo, hi) => Some((lo, hi))
+      case Precise(n)      => Some((n, Precise(n)))
       case _               => None
     }
   }
   // Return (lo, hi) as sizes unless arg is or contains Infinite.
   object Finite {
     def unapply(x: SizeInfo): Option[(Size, Size)] = x match {
-      case Bounded(lo, Precise(hi)) => Some(lo -> hi)
-      case Precise(n)               => Some(n -> n)
+      case Bounded(lo, Precise(hi)) => Some((lo, hi))
+      case Precise(n)               => Some((n, n))
       case _                        => None
     }
   }
@@ -140,7 +140,7 @@ final class SizeInfoOperations(val lhs: SizeInfo) extends AnyVal {
   )
 
   def slice(range: Interval): SizeInfo = {
-    val Interval(start, end) = range
+    val Interval(start: Index, end: Index) = range
     lhs match {
       case Precise(Size(n))                     => Precise(preciseSliceSize(n, start, end))
       case Bounded(Size(lo), Precise(Size(hi))) => bounded(preciseSliceSize(lo, start, end), Precise(preciseSliceSize(hi, start, end)))

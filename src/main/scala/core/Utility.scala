@@ -1,6 +1,7 @@
 package psp
 package core
 
+// WTF? racy!
 class Counter() {
   private[this] var counted = 0
   def inc(): this.type = try this finally counted += 1

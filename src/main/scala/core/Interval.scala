@@ -1,6 +1,7 @@
 package psp
 package core
 
+import psp.collection.{ Direct, IntRange }
 import Interval.Empty
 
 final class Interval private (val start: Index, val end: Index) {
@@ -32,7 +33,7 @@ final class Interval private (val start: Index, val end: Index) {
   def firstIndex: Index       = if (isEmpty) NoIndex else start
   def lastIndex: Index        = if (isEmpty) NoIndex else end - 1
   def toScalaRange: Range     = scala.collection.immutable.Range(start, end, 1)
-  def toIndexed: Direct[Int] = IntRange.until(start, end)
+  def toIndexed: Direct[Int]  = IntRange.until(start, end)
   override def toString       = if (isEmpty) "[0,0)" else pp"[$start,$end)" //pp"[$firstIndex,$lastIndex]"
 }
 

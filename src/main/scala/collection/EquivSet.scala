@@ -1,7 +1,7 @@
 package psp
-package core
+package collection
 
-import scala.collection.{ mutable, immutable }
+import scala.collection.immutable
 
 abstract class Equiv[A] {
   def equiv(x: A, y: A): Boolean
@@ -10,7 +10,7 @@ abstract class Equiv[A] {
   final class Wrap(val element: A) {
     def unwrap = element
     final override def equals(that: Any): Boolean = that match {
-      case x: Wrap => try equiv(element, x.element.castTo[A]) catch { case _: ClassCastException => false }
+      case x: Wrap => try equiv(element, x.element.asInstanceOf[A]) catch { case _: ClassCastException => false }
       case _       => false
     }
     override def hashCode = hash(element)

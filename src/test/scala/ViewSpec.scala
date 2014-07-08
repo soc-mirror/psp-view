@@ -2,8 +2,9 @@ package psp
 package tests
 
 import scala.collection.immutable
+import psp.collection.{ Foreach }
+
 import utest._
-import psp.core.{ Foreach }
 
 object ViewSpec extends TestSuite {
   def checkResult[T: ClassTag](result: Object) = assert(classTag[T].runtimeClass isAssignableFrom result.getClass)

@@ -1,7 +1,8 @@
 package psp
 package core
 
-import Size._
+//import Size._
+import psp.collection.Direct
 
 class OverflowException extends RuntimeException
 
@@ -16,12 +17,12 @@ final class Size private (val value: Int) extends AnyVal with Ordered[Size] {
   def min(that: Size): Size    = Size(value min that.value)
   def max(that: Size): Size    = Size(value max that.value)
 
-  def isZero                        = this == Zero
-  def isError                       = this == NoSize
+  def isZero                        = this == Size.Zero
+  def isError                       = this == Size.NoSize
   def toInterval: Interval          = Interval(0, value)
-  def reverseInterval: Direct[Int] = toInterval.reverse
+  def reverseInterval: Direct[Int]  = toInterval.reverse
   def toScalaRange                  = toInterval.toScalaRange
-  def toIndexed: Direct[Int]       = toInterval.toIndexed
+  def toIndexed: Direct[Int]        = toInterval.toIndexed
   def toInt: Int                    = value
   def toLong: Long                  = value
   def toOption: Option[Int]         = if (isError) None else Some(toInt)

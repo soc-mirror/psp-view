@@ -2,6 +2,7 @@ package psp
 package core
 
 import java.{ lang => jl }
+import psp.collection.{ Direct, Foreach, IntRange }
 
 final class PspInt(val self: Int) extends AnyVal with Ordered[Int] {
   def compare(rhs: Int): Int = jl.Integer.compare(self, rhs)

@@ -1,8 +1,9 @@
 package psp
 package core
 
-import impl._
 import java.nio.file.Paths
+import psp.collection._
+
 
 trait PspUtilityMethods extends PspUniversals {
   def jClassOf[T: ClassTag] : jClass[T] = classTag[T].runtimeClass.castTo[jClass[T]]
@@ -71,13 +72,13 @@ trait PspHighPriority extends PspMidPriority with CollectionHigh {
 }
 
 class ForeachableBuilderOps[A, Repr, CC[X]](tc: ForeachableType[A, Repr, CC]) {
-  def genericBuilder[B]: Builder[B, CC[B]] = ??? // pcb.newBuilder()
-  def nativeBuilder: Builder[A, Repr]      = ??? // pcb.newBuilder()
+  def genericBuilder[B]: Builder[B, CC[B]] = pcb.newBuilder()
+  def nativeBuilder: Builder[A, Repr]      = pcb.newBuilder()
 }
 
 class DirectAccessBuilderOps[A, Repr, CC[X]](tc: DirectAccessType[A, Repr, CC]) {
-  def genericBuilder[B]: Builder[B, CC[B]] = ??? // pcb.newBuilder()
-  def nativeBuilder: Builder[A, Repr]      = ??? // pcb.newBuilder()
+  def genericBuilder[B]: Builder[B, CC[B]] = pcb.newBuilder()
+  def nativeBuilder: Builder[A, Repr]      = pcb.newBuilder()
 }
 
 /** It's kind of funny... I guess.

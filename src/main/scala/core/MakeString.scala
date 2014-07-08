@@ -2,6 +2,7 @@ package psp
 package core
 
 import scala.reflect.io.Streamable
+import psp.collection.Foreach
 
 trait ToString extends Any {
   def to_s: String

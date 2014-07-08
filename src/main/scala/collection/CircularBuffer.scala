@@ -1,5 +1,7 @@
 package psp
-package core
+package collection
+
+import psp.core._
 
 final class CircularBuffer[A](capacity: Size) extends Foreach[A] {
   assert(!capacity.isZero, capacity)

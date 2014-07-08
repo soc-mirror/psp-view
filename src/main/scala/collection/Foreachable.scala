@@ -1,7 +1,7 @@
 package psp
-package core
+package collection
 
-import impl._
+import psp.core._
 
 trait WalkableTypes {
   type A

@@ -1,8 +1,11 @@
 package psp
-package core
 package api
 
-trait View[+A] extends Any with TypeConstructors[A] with IsoView[A] with MapElementView[A] with MeasurementView {
+import psp.collection.Foreach
+import psp.core._
+
+trait View[+A] extends Any with TypeConstructors[A] with IsoView[A] with MapElementView[A]
+    with ClusterView[A] with MeasurementView {
   type MapTo[+X] <: View[X]
 
   // Defined here for the moment out of expedience.
@@ -15,7 +18,7 @@ trait AtomicView[+A] extends Any with View[A] {
   def m: AtomicView[A]
 }
 trait CompositeView[+A] extends Any with View[A] {
-  def prev: api.View[_]
+  def prev: psp.api.View[_]
 }
 
 trait MeasurementView extends Any {

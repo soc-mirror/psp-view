@@ -1,9 +1,9 @@
 package psp
-package core
+package collection
 
 import scala.{ collection => sc }
-import SizeInfo._
-import impl._
+import psp.core._
+import psp.core.SizeInfo._
 
 trait Foreach[+A] extends Any with HasSizeInfo {
   def foreach(f: A => Unit): Unit
@@ -73,7 +73,7 @@ object Foreach extends ForeachImplicits {
   def times[A](times: Int, elem: A): Foreach[A]   = Times(Size(times), elem)
 
   def unfold[A](start: A)(next: A => A): Unfold[A]          = Unfold[A](start)(next)
-  def traversable[A](xs: GenTraversableOnce[A]): Foreach[A] = FromScala(xs)
+  def traversable[A](xs: GenTraversableOnce[A]): Foreach[A] = compat.FromScala(xs)
 
   def join[A](xs: Foreach[A], ys: Foreach[A]): Foreach[A] = {
     val sizeInfo = xs.sizeInfo + ys.sizeInfo

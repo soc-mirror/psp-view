@@ -3,6 +3,7 @@ package core
 
 import scala.{ collection => sc }
 import sc.{ mutable => scm, generic => scg }
+import psp.collection.{ Foreachable, DirectAccess, SequentialAccess, WalkableTypes }
 
 /** A thin abstraction over some questionable assumptions. */
 trait PspTypes extends PspJavaTypes with PspScalaTypes {
@@ -26,7 +27,7 @@ trait PspTypes extends PspJavaTypes with PspScalaTypes {
   type IndexedView[Repr, W <: WalkableTypes] = Env[Repr, W]#IndexedView
   type LinearView[Repr, W <: WalkableTypes]  = Env[Repr, W]#LinearView
 
-  type Env[Repr, W <: WalkableTypes] = ViewEnvironment[W#A, Repr, W#CC]
+  type Env[Repr, W <: WalkableTypes] = collection.ViewEnvironment[W#A, Repr, W#CC]
 
   type ForeachableType[A0, Repr, CC0[X]] = Foreachable[Repr] {
     type A = A0

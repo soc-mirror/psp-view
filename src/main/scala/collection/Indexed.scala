@@ -1,14 +1,14 @@
 package psp
-package core
+package collection
 
-import impl._
+import psp.core._
 
 trait Indexed[+A] extends Any with Foreach[A] {
   def isDefinedAt(index: Index): Boolean
   def elemAt(index: Index): A
   // TODO - move onto Ops
-  def zip[B](that: Indexed[B]): Indexed[(A, B)]                                                       = zipWith(that)(_ -> _)
-  def zipWith[A1, B](that: Indexed[A1])(f: (A, A1) => B): Indexed[B]                                  = new ZippedIndexed2(this, that, f)
+  def zip[B](that: Indexed[B]): Indexed[(A, B)]                                                   = zipWith(that)(_ -> _)
+  def zipWith[A1, B](that: Indexed[A1])(f: (A, A1) => B): Indexed[B]                              = new ZippedIndexed2(this, that, f)
   def zipWith[A1, A2, B](that1: Indexed[A1], that2: Indexed[A2])(f: (A, A1, A2) => B): Indexed[B] = new ZippedIndexed3(this, that1, that2, f)
 }
 

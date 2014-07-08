@@ -1,6 +1,8 @@
 package psp
-package core
 package api
+
+import psp.core._
+import psp.collection.{ Linear, Direct }
 
 trait ViewEnvironment[A, Repr, CC[X]] {
   def unknownView(tc: ForeachableType[A, Repr, CC]): AtomicView

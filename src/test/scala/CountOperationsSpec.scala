@@ -2,6 +2,7 @@ package psp
 package tests
 
 import core._
+import collection._
 import compat.ScalaNative
 import utest._
 

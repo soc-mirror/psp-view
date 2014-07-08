@@ -4,7 +4,7 @@ package tests
 import utest._
 
 object NatSpec extends TestSuite {
-  val list = core.NatList(1, 2, 3, 4)
+  val list = collection.NatList(1, 2, 3, 4)
   val tests = TestSuite {
     "zip2sum" - {
       val result = list zip list map (_ + _)

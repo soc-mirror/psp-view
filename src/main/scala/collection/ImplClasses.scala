@@ -1,9 +1,9 @@
 package psp
-package core
-package impl
+package collection
 
 import scala.{ collection => sc }
 import sc.{ mutable => scm }
+import psp.core._
 
 /** Compat
  */

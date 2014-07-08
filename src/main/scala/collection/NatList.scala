@@ -1,5 +1,7 @@
 package psp
-package core
+package collection
+
+import psp.core._
 
 import Nat._
 import NatList._
