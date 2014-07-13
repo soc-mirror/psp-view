@@ -3,7 +3,6 @@ package collection
 package compat
 
 import psp.core._
-import psp.collection.Foreach
 
 /** Compatibility layer for wrapping scala views on their own terms.
  */
@@ -22,10 +21,10 @@ final class ScalaNative[+A](val xs: Iterable[A], val counter: Counter) extends a
     case _                 => unknownSize
   }
   def foreach(f: A => Unit): Unit                       = xs foreach f
-  def map[B](f: A => B): MapTo[B]                       = xs map f
-  def ++[A1 >: A](that: Foreach[A1]): MapTo[A1]         = xs ++ that.toTraversable.seq
-  def flatMap[B](f: A => Input[B]): MapTo[B]            = xs flatMap (x => f(x).trav)
-  def flatten[B](implicit ev: A <:< Input[B]): MapTo[B] = xs flatMap (x => ev(x).trav)
+  override def map[B](f: A => B): MapTo[B]                       = xs map f
+  override def ++[A1 >: A](that: Foreach[A1]): MapTo[A1]         = xs ++ that.toTraversable.seq
+  override def flatMap[B](f: A => Input[B]): MapTo[B]            = xs flatMap (x => f(x).trav)
+  override def flatten[B](implicit ev: A <:< Input[B]): MapTo[B] = xs flatMap (x => ev(x).trav)
   def filter(p: Predicate[A]): MapTo[A]                 = xs filter p
   def filterNot(p: Predicate[A]): MapTo[A]              = xs filterNot p
   def drop(n: Int): MapTo[A]                            = xs drop n
@@ -35,15 +34,12 @@ final class ScalaNative[+A](val xs: Iterable[A], val counter: Counter) extends a
   def dropRight(n: Int): MapTo[A]                       = xs dropRight n
   def takeRight(n: Int): MapTo[A]                       = xs takeRight n
 
-  def collect[B](pf: PartialFunction[A,B]): MapTo[B] = xs collect pf
+  override def collect[B](pf: PartialFunction[A,B]): MapTo[B] = xs collect pf
   def labeled(label: String): MapTo[A]               = this
   def reverse: MapTo[A]                              = xs.reverse
   def sized(size: Size): MapTo[A]                    = this
   def slice(range: Interval): MapTo[A]               = xs.slice(range.start, range.end)
   def withFilter(p: Predicate[A]): MapTo[A]          = xs filter p
-  
-  def sliding(size: Size, step: Int): MapTo[Cluster[A]] = ???
-  def groupBy[B](f: A => B): MapTo[(B, Cluster[A])]     = ???
 
   def description = xs.shortClass
   def viewChain: List[api.View[_]] = this :: Nil

@@ -1,6 +1,6 @@
 import scala.collection.{ mutable, immutable }
 import scala.reflect.runtime.{ universe => ru }
-import psp._, core._
+import psp.core._, psp.collection._
 import immutable.BitSet
 implicit final class ReplOps[A](val target: A) {
   def >(): Unit = target.toElements map (_.to_s) foreach println

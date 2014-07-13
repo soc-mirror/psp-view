@@ -72,13 +72,13 @@ trait PspHighPriority extends PspMidPriority with CollectionHigh {
 }
 
 class ForeachableBuilderOps[A, Repr, CC[X]](tc: ForeachableType[A, Repr, CC]) {
-  def genericBuilder[B]: Builder[B, CC[B]] = pcb.newBuilder()
-  def nativeBuilder: Builder[A, Repr]      = pcb.newBuilder()
+  def genericBuilder[B]: Builder[B, CC[B]] = ??? // pcb.newBuilder()
+  def nativeBuilder: Builder[A, Repr]      = ??? // pcb.newBuilder()
 }
 
 class DirectAccessBuilderOps[A, Repr, CC[X]](tc: DirectAccessType[A, Repr, CC]) {
-  def genericBuilder[B]: Builder[B, CC[B]] = pcb.newBuilder()
-  def nativeBuilder: Builder[A, Repr]      = pcb.newBuilder()
+  def genericBuilder[B]: Builder[B, CC[B]] = ??? // pcb.newBuilder()
+  def nativeBuilder: Builder[A, Repr]      = ??? // pcb.newBuilder()
 }
 
 /** It's kind of funny... I guess.

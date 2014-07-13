@@ -22,9 +22,9 @@ class ViewEnvironment[A0, Repr, CC0[X]](val repr: Repr) extends api.ViewEnvironm
   type A = A0
   type CC[X] = CC0[X]
 
-  def linearView(tc: SequentialAccessType[A, Repr, CC]): LinearView    = new LinearView(tc)
+  def linearView(tc: SequentialAccessType[A, Repr, CC]): LinearView = new LinearView(tc)
   def indexedView(tc: DirectAccessType[A, Repr, CC]): IndexedView   = new IndexedView(tc)
-  def unknownView(tc: ForeachableType[A, Repr, CC]): UnknownView = new UnknownView(tc)
+  def unknownView(tc: ForeachableType[A, Repr, CC]): UnknownView    = new UnknownView(tc)
 
   final class UnknownView(val tc: ForeachableType[A, Repr, CC]) extends AtomicView with LinearViewImpls {
     def sizeInfo = unknownSize
@@ -58,30 +58,30 @@ class ViewEnvironment[A0, Repr, CC0[X]](val repr: Repr) extends api.ViewEnvironm
 
     def isAtomic: Boolean
 
-    final def map[B](f: A => B): MapTo[B]                       = Mapped(this, f)
-    final def flatMap[B](f: A => Foreach[B]): MapTo[B]          = FlatMapped(this, f)
-    final def flatten[B](implicit ev: A <:< Input[B]): MapTo[B] = flatMap(x => x)
-    final def collect[B](pf: A =?> B): MapTo[B]                 = Collected(this, pf)
-    final def ++[A1 >: A](that: Foreach[A1]): MapTo[A1]         = Joined(this, that.m.castTo[View[A1]])
+    override final def map[B](f: A => B): MapTo[B]                       = Mapped(this, f)
+    override final def flatMap[B](f: A => Foreach[B]): MapTo[B]          = FlatMapped(this, f)
+    override final def flatten[B](implicit ev: A <:< Input[B]): MapTo[B] = flatMap(x => x)
+    override final def collect[B](pf: A =?> B): MapTo[B]                 = Collected(this, pf)
+    override final def ++[A1 >: A](that: Foreach[A1]): MapTo[A1]         = Joined(this, that.m.castTo[View[A1]])
 
-    final def withFilter(p: Predicate[A]): MapTo[A] = Filtered(this, p)
-    final def filter(p: Predicate[A]): MapTo[A]     = Filtered(this, p)
-    final def filterNot(p: Predicate[A]): MapTo[A]  = Filtered(this, (x: A) => !p(x))
-    final def drop(n: Int): MapTo[A]                = Dropped(this, Size(n))
-    final def take(n: Int): MapTo[A]                = Taken(this, Size(n))
-    final def takeWhile(p: Predicate[A]): MapTo[A]  = TakenWhile(this, p)
-    final def dropWhile(p: Predicate[A]): MapTo[A]  = DropWhile(this, p)
-    final def dropRight(n: Int): MapTo[A]           = DroppedR(this, Size(n))
-    final def takeRight(n: Int): MapTo[A]           = TakenR(this, Size(n))
-    final def slice(range: Interval): MapTo[A]      = Sliced(this, range)
-    final def labeled(label: String): MapTo[A]      = LabeledView(this, label)
-    final def sized(size: Size): MapTo[A]           = Sized(this, size)
-    final def reverse: MapTo[A]                     = Reversed(this)
-    final def sliding(size: Size, step: Int): MapTo[Cluster[A]] = ???
-    final def groupBy[B](f: A => B): MapTo[(B, Cluster[A])]     = ???
+    override final def withFilter(p: Predicate[A]): MapTo[A] = Filtered(this, p)
+    override final def filter(p: Predicate[A]): MapTo[A]     = Filtered(this, p)
+    override final def filterNot(p: Predicate[A]): MapTo[A]  = Filtered(this, (x: A) => !p(x))
+    override final def drop(n: Int): MapTo[A]                = Dropped(this, Size(n))
+    override final def take(n: Int): MapTo[A]                = Taken(this, Size(n))
+    override final def takeWhile(p: Predicate[A]): MapTo[A]  = TakenWhile(this, p)
+    override final def dropWhile(p: Predicate[A]): MapTo[A]  = DropWhile(this, p)
+    override final def dropRight(n: Int): MapTo[A]           = DroppedR(this, Size(n))
+    override final def takeRight(n: Int): MapTo[A]           = TakenR(this, Size(n))
+    override final def slice(range: Interval): MapTo[A]      = Sliced(this, range)
+    override final def labeled(label: String): MapTo[A]      = LabeledView(this, label)
+    override final def sized(size: Size): MapTo[A]           = Sized(this, size)
+    override final def reverse: MapTo[A]                     = Reversed(this)
+    override final def sliding(size: Size, step: Int): MapTo[Cluster[A]] = ???
+    override final def groupBy[B](f: A => B): MapTo[(B, Cluster[A])]     = ???
 
-    final def native(implicit pcb: Builds[A, Repr]): Repr      = force[Repr]
-    final def force[That](implicit pcb: Builds[A, That]): That = pcb build this
+    override final def native(implicit pcb: Builds[A, Repr]): Repr      = force[Repr]
+    override final def force[That](implicit pcb: Builds[A, That]): That = pcb build this
 
     override def toString = viewChain reverseMap (_.description) mkString " "
   }
