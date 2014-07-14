@@ -7,7 +7,7 @@ import psp.collection.{ Foreachable, DirectAccess, SequentialAccess, WalkableTyp
 
 /** A thin abstraction over some questionable assumptions. */
 trait PspTypes extends PspJavaTypes with PspScalaTypes {
-  type Index              = Int
+  type Index              = Long
   type Done               = Boolean
   type Suspended[+A]      = (A => Unit) => Unit
   type Ref[+A]            = A with AnyRef

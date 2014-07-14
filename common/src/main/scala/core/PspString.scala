@@ -2,7 +2,7 @@ package psp
 package core
 
 import java.{ lang => jl }
-import psp.collection.{ Direct, DirectLeaf, IntRange }
+import psp.collection.{ Direct, DirectLeaf, LongRange }
 
 final class Line(val text: String) extends AnyVal {
   override def toString = text
@@ -47,7 +47,7 @@ final class PspStringAsBytes(val repr: String) extends IndexedLeafImpl[Byte] {
   private[this] val bytes: Array[Byte] = repr.getBytes()
 
   def size: Size                             = bytes.size
-  def elemAt(index: Index): Byte             = bytes(index)
+  def elemAt(index: Index): Byte             = bytes(index.toInt)
   def isDefinedAt(index: Index): Boolean     = size containsIndex index
   @inline def foreach(f: Byte => Unit): Unit = Direct pure bytes foreach f
   def contains(x: Byte): Boolean             = ??? // bytes contains x
@@ -59,7 +59,7 @@ final class PspStringAsChars(val repr: String) extends AnyVal with IndexedLeafIm
   private def chars: Array[Char] = repr.toCharArray
 
   def size                                   = Size(chars.length)
-  def elemAt(index: Index): Char             = repr charAt index
+  def elemAt(index: Index): Char             = repr charAt index.toInt
   def isDefinedAt(index: Index): Boolean     = size containsIndex index
   @inline def foreach(f: Char => Unit): Unit = Direct pure chars foreach f
   def contains(x: Char): Boolean             = ??? // chars contains x
@@ -68,18 +68,18 @@ final class PspStringAsChars(val repr: String) extends AnyVal with IndexedLeafIm
 }
 
 final class PspStringAsLines(val repr: String) extends AnyVal with IndexedLeafImpl[Line] {
-  private def isEol(index: Int)        = index >= 0 && repr.startsWith(EOL, index)
-  private def isStart(index: Int)      = index == 0 || isEol(index - EOL.length)
-  private def isEnd(index: Int)        = index == repr.length || isEol(index)
-  private def starts: Direct[Int]     = 0 to repr.length filter isStart force
-  private def ends: Direct[Int]       = 0 to repr.length filter isEnd force
+  private def isEol(index: Long)      = index >= 0 && repr.startsWith(EOL, index.toInt)
+  private def isStart(index: Long)    = index == 0 || isEol(index - EOL.length)
+  private def isEnd(index: Long)      = index == repr.length || isEol(index)
+  private def starts: Direct[Long]    = 0 to repr.length filter isStart force
+  private def ends: Direct[Long]      = 0 to repr.length filter isEnd force
   private def strings: Direct[String] = Regex(EOL) splits repr
   private def lines: Direct[Line]     = strings map (x => new Line(x)) force
 
-  def ranges: Direct[Interval]            = starts.zipWith(ends)(Interval).toIndexed
-  def indicesOfLine(lineno: Int): Interval = ranges elemAt lineno - 1
-  def line(lineno: Int): Line              = elemAt(lineno - 1)
-  def lineNumbers: IntRange                = 1 to size.value
+  def ranges: Direct[Interval]              = starts.zipWith(ends)(Interval).toIndexed
+  def indicesOfLine(lineNo: Long): Interval = ranges elemAt lineNo - 1
+  def line(lineNo: Long): Line              = elemAt(lineNo - 1)
+  def lineNumbers: LongRange                = 1 to size.value
 
   def size                                   = strings.size
   def elemAt(index: Index): Line             = lines elemAt index

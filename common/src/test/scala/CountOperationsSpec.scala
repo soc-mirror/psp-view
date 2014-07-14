@@ -14,16 +14,16 @@ object CountOperationsSpec extends TestSuite {
   }
   showResults()
 
-  type IntView = api.View[Int]
+  type LongView = api.View[Long]
 
-  lazy val tupleFlatMap: Int => Foreach[Int] = ((x: Int) => Foreach.elems(x, x)) labeled "(x, x)"
-  lazy val isEven: Int => Boolean            = ((x: Int) => x % 2 == 0) labeled "isEven"
-  lazy val timesThree: Int => Int            = ((x: Int) => x * 3) labeled "*3"
-  lazy val collectDivSix: Int =?> Int        = labelpf("%/6")({ case x: Int if x % 6 == 0 => x / 6 })
+  lazy val tupleFlatMap: Long => Foreach[Long] = ((x: Long) => Foreach.elems(x, x)) labeled "(x, x)"
+  lazy val isEven: Long => Boolean             = ((x: Long) => x % 2 == 0) labeled "isEven"
+  lazy val timesThree: Long => Long            = ((x: Long) => x * 3) labeled "*3"
+  lazy val collectDivSix: Long =?> Long        = labelpf("%/6")({ case x: Long if x % 6 == 0 => x / 6 })
 
   def max    = 1000
   def numOps = 3
-  def basicOps = List[IntView => IntView](
+  def basicOps = List[LongView => LongView](
     _ drop 5,
     _ dropRight 11,
     _ slice Interval(7, 41),
@@ -35,29 +35,29 @@ object CountOperationsSpec extends TestSuite {
     _ collect collectDivSix
   )
 
-  def scalaIntRange: scala.collection.immutable.Range = Range.inclusive(1, max, 1)
+  def scalaLongRange = scala.collection.immutable.NumericRange.inclusive[Long](1, max, 1)
 
-  def usCollections = List[IntView](
+  def usCollections = List[LongView](
     PspList.to(1, max).m,
     PspList.to(1, max).m sized Size(max),
-    IntRange.to(1, max).m,
-    IntRange.to(1, max / 2).m ++ IntRange.to(max / 2 + 1, max)
+    LongRange.to(1, max).m,
+    LongRange.to(1, max / 2).m ++ LongRange.to(max / 2 + 1, max)
   )
-  def themCollections = List[IntView](
-    ScalaNative(scalaIntRange.toList.view),
-    ScalaNative(scalaIntRange.toStream),
-    ScalaNative(scalaIntRange.toStream.view),
-    ScalaNative(scalaIntRange.view),
-    ScalaNative(scalaIntRange.toVector.view)
+  def themCollections = List[LongView](
+    ScalaNative(scalaLongRange.toList.view),
+    ScalaNative(scalaLongRange.toStream),
+    ScalaNative(scalaLongRange.toStream.view),
+    ScalaNative(scalaLongRange.view),
+    ScalaNative(scalaLongRange.toVector.view)
   )
   def rootCollections = usCollections ++ themCollections
 
-  def compositesOfN(n: Int): List[IntView => IntView] = (
+  def compositesOfN(n: Int): List[LongView => LongView] = (
     (basicOps combinations n flatMap (_.permutations.toList)).toList.distinct
       map (xss => xss reduceLeft (_ andThen _))
   )
 
-  class CollectionResult(viewFn: IntView => IntView, xs: IntView) {
+  class CollectionResult(viewFn: LongView => LongView, xs: LongView) {
     val view    = viewFn(xs)
     val result  = view take 3 mkString ", "
     val count   = xs.calls
@@ -70,9 +70,9 @@ object CountOperationsSpec extends TestSuite {
     override def toString = display
   }
 
-  class CompositeOp(viewFn: IntView => IntView) {
+  class CompositeOp(viewFn: LongView => LongView) {
     val us: List[CollectionResult]   = usCollections map (xs => new CollectionResult(viewFn, xs))
-    val control: CollectionResult    = new CollectionResult(viewFn, ScalaNative(scalaIntRange.toList))
+    val control: CollectionResult    = new CollectionResult(viewFn, ScalaNative(scalaLongRange.toList))
     val them: List[CollectionResult] = themCollections map (xs => new CollectionResult(viewFn, xs))
     val all: List[CollectionResult]  = us ++ (control +: them)
 

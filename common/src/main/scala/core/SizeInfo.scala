@@ -132,7 +132,7 @@ final class SizeInfoOperations(val lhs: SizeInfo) extends AnyVal {
     case x: Atomic      => x
   }
 
-  private def preciseSliceSize(size: Int, start: Int, end: Int): Size = (
+  private def preciseSliceSize(size: Long, start: Long, end: Long): Size = (
     if (start < 0) preciseSliceSize(size, 0, end)
     else if (size <= start || end <= start) Size(0)
     else if (end < size) Size(end - start)
@@ -149,9 +149,9 @@ final class SizeInfoOperations(val lhs: SizeInfo) extends AnyVal {
     }
   }
 
-  def precisely: Option[Int] = lhs match { case Precise(Size(n)) => Some(n) ; case _ => None }
-  def preciseOr(alt: => Int): Int = precisely getOrElse alt
-  def preciseIntSize: Int = preciseOr(sys error s"precise size unavailable: $lhs")
+  def precisely: Option[Long]       = lhs match { case Precise(Size(n)) => Some(n) ; case _ => None }
+  def preciseOr(alt: => Long): Long = precisely getOrElse alt
+  def preciseLongSize: Long         = preciseOr(sys error s"precise size unavailable: $lhs")
 
   def * (rhs: Size): SizeInfo = lhs match {
     case Precise(n)               => Precise(n * rhs.value)

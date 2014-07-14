@@ -5,11 +5,10 @@ import scala.{ collection => sc }
 import sc.{ mutable => scm }
 import psp.core._
 
-/** Compat
- */
+/** Compat */
 
 final class ScalaIndexedSeqAsIndexed[+A](underlying: sc.IndexedSeq[A]) extends IndexedImpl[A](Size(underlying.size)) {
-  def elemAt(index: Index) = underlying(index)
+  def elemAt(index: Index) = underlying(index.toInt)
   override def toString = underlying.shortClass + " (wrapped)"
 }
 
@@ -59,7 +58,7 @@ abstract class IndexedImpl[+A](val size: Size) extends Direct[A] with HasPrecise
  */
 object StringIsCharSequence extends DirectAccessImpl[Char, String, Direct] {
   def length(repr: String): Size               = Size(repr.length)
-  def elemAt(repr: String)(index: Index): Char = repr charAt index
+  def elemAt(repr: String)(index: Index): Char = repr charAt index.toInt
 }
 object StringIsLineSequence extends DirectAccessImpl[Line, String, Direct] {
   def length(repr: String): Size               = wrap(repr).size
@@ -69,11 +68,11 @@ object StringIsLineSequence extends DirectAccessImpl[Line, String, Direct] {
 
 final class ArrayIsDirectAccess[A: ClassTag] extends DirectAccessImpl[A, Array[A], Direct] {
   def length(repr: Array[A]): Size            = Size(repr.length)
-  def elemAt(repr: Array[A])(index: Index): A = repr(index)
+  def elemAt(repr: Array[A])(index: Index): A = repr(index.toInt)
 }
 final class IndexedSeqIsDirectAccess[CC[X] <: IndexedSeq[X], A] extends DirectAccessImpl[A, CC[A], CC] {
   def length(repr: CC[A]): Size            = Size(repr.length)
-  def elemAt(repr: CC[A])(index: Index): A = repr(index)
+  def elemAt(repr: CC[A])(index: Index): A = repr(index.toInt)
 }
 final class PspIndexedIsDirectAccess[A0] extends DirectAccessImpl[A0, Direct[A0], Direct] {
   def length(repr: Direct[A0]): Size             = repr.size

@@ -1,8 +1,8 @@
 package psp
-package core
+package collection
 
 import java.{ lang => jl }
-import psp.collection.{ Foreach, Indexed }
+import psp.core.{ Size, SizeInfo, ArrayBuffer, LinkedBlockingQueue, nullAs }
 
 final class MemoIndexed[+A](xs: Foreach[A]) extends Indexed[A] {
   @volatile private[this] var seen = 0
@@ -21,14 +21,14 @@ final class MemoIndexed[+A](xs: Foreach[A]) extends Indexed[A] {
     case _    => true
   })
 
-  def isDefinedAt(i: Int): Boolean = (i >= 0) && {
+  def isDefinedAt(i: Long): Boolean = (i >= 0) && {
     thread
     while (i >= seen && hasNext) next()
     i < seen
   }
 
   def foreach(f: A => Unit): Unit = {
-    def loop(i: Int): Unit = {
+    def loop(i: Long): Unit = {
       if (isDefinedAt(i)) {
         f(elemAt(i))
         loop(i + 1)
@@ -36,8 +36,8 @@ final class MemoIndexed[+A](xs: Foreach[A]) extends Indexed[A] {
     }
     loop(0)
   }
-  def apply(index: Int): A = elemAt(index)
-  def elemAt(index: Int): A = if (isDefinedAt(index)) memo(index) else sys.error(s"Out of range: $index")
+  def apply(index: Long): A = elemAt(index)
+  def elemAt(index: Long): A = if (isDefinedAt(index)) memo(index.toInt) else sys.error(s"Out of range: $index")
   def sizeInfo: SizeInfo = if (done) Size(seen).toInfo else Size(seen).toInfo.atLeast
   override def toString = "<memo>"
 }
@@ -47,9 +47,9 @@ final class ZippedIndexed2[A, B, +C](left: Indexed[A], right: Indexed[B], f: (A,
     var i = 0
     while (isDefinedAt(i)) { f(elemAt(i)); i += 1 }
   }
-  def isDefinedAt(index: Int): Boolean = (left isDefinedAt index) && (right isDefinedAt index)
-  def apply(index: Int): C             = elemAt(index)
-  def elemAt(index: Int): C            = f(left elemAt index, right elemAt index)
+  def isDefinedAt(index: Long): Boolean = (left isDefinedAt index) && (right isDefinedAt index)
+  def apply(index: Long): C             = elemAt(index)
+  def elemAt(index: Long): C            = f(left elemAt index, right elemAt index)
   def sizeInfo: SizeInfo               = left.sizeInfo min right.sizeInfo
 }
 
@@ -58,8 +58,8 @@ final class ZippedIndexed3[A, A1, A2, +B](xs1: Indexed[A], xs2: Indexed[A1], xs3
     var i = 0
     while (isDefinedAt(i)) { f(elemAt(i)); i += 1 }
   }
-  def isDefinedAt(index: Int): Boolean = (xs1 isDefinedAt index) && (xs2 isDefinedAt index) && (xs3 isDefinedAt index)
-  def apply(index: Int): B             = elemAt(index)
-  def elemAt(index: Int): B            = f(xs1(index), xs2(index), xs3(index))
+  def isDefinedAt(index: Long): Boolean = (xs1 isDefinedAt index) && (xs2 isDefinedAt index) && (xs3 isDefinedAt index)
+  def apply(index: Long): B             = elemAt(index)
+  def elemAt(index: Long): B            = f(xs1(index), xs2(index), xs3(index))
   def sizeInfo: SizeInfo               = xs1.sizeInfo min xs2.sizeInfo min xs3.sizeInfo
 }

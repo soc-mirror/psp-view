@@ -6,7 +6,7 @@ import psp.core._
 object PspList {
   implicit def newBuilder[A] : Builds[A, PspList[A]] = Builds(fromForeach)
 
-  def to(start: Int, end: Int): PspList[Int] = fromForeach(Foreach.to(start, end))
+  def to(start: Long, end: Long): PspList[Long] = fromForeach(Foreach.to(start, end))
 
   // implicit def nilIsCovariant[A](xs: nil.type): PspList[A] = empty[A]
   def fromForeach[A](xs: Foreach[A]): PspList[A] = xs match {

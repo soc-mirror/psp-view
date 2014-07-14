@@ -6,26 +6,27 @@ import psp.collection.Direct
 
 class OverflowException extends RuntimeException
 
-final class Size private (val value: Int) extends AnyVal with Ordered[Size] {
-  private def checkSum(sum: Int): Size = try Size(sum) finally if (sum < value) fail(s"overflow: $value + ... == $sum")
+final class Size private (val value: Long) extends AnyVal with Ordered[Size] {
+  private def checkSum(sum: Long): Size = try Size(sum) finally if (sum < value) fail(s"overflow: $value + ... == $sum")
+  private def checkValidInt(num: Long): Int = if (??? /*num.isValidInt*/) num.toInt else fail(s"overflow: $num cannot be converted to a value of type Int")
 
-  def compare(that: Size): Int = value compare that.value
+  def compare(that: Size): Int = java.lang.Long.compare(value, that.value)
   def + (n: Size): Size        = checkSum(value + n.value)
   def - (n: Size): Size        = Size(value - n.value)
-  def * (n: Int): Size         = Size(value * n)
-  def / (n: Int): Size         = if (n == 0) fail("division by zero") else Size(value / n)
-  def min(that: Size): Size    = Size(value min that.value)
-  def max(that: Size): Size    = Size(value max that.value)
+  def * (n: Long): Size        = Size(value * n)
+  def / (n: Long): Size        = if (n == 0) fail("division by zero") else Size(value / n)
+  def min(that: Size): Size    = Size(math.max(value, that.value))
+  def max(that: Size): Size    = Size(math.max(value, that.value))
 
   def isZero                        = this == Size.Zero
   def isError                       = this == Size.NoSize
   def toInterval: Interval          = Interval(0, value)
-  def reverseInterval: Direct[Int]  = toInterval.reverse
+  def reverseInterval: Direct[Long] = toInterval.reverse
   def toScalaRange                  = toInterval.toScalaRange
-  def toIndexed: Direct[Int]        = toInterval.toIndexed
-  def toInt: Int                    = value
+  def toIndexed: Direct[Long]       = toInterval.toIndexed
+  def toInt: Int                    = checkValidInt(value)
   def toLong: Long                  = value
-  def toOption: Option[Int]         = if (isError) None else Some(toInt)
+  def toOption: Option[Long]        = if (isError) None else Some(toInt)
   def toInfo: Precise               = if (isError) fail(s"Cannot translate erroneous size") else Precise(this)
 
   @inline def foreachIndex(f: Index => Unit): Unit = toInterval foreach f
@@ -47,8 +48,8 @@ object Size {
   final val Four   = new Size(4)
   final val Five   = new Size(5)
 
-  def apply(n: Int): Size           = if (n <= 0) Zero else new Size(n)
-  def unapply(s: Size): Option[Int] = s.toOption
+  def apply(n: Long): Size           = if (n <= 0) Zero else new Size(n)
+  def unapply(s: Size): Option[Long] = s.toOption
 
   private def fail(msg: String): Nothing = throw new ArithmeticException(msg)
 }

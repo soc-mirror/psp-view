@@ -17,7 +17,7 @@ trait Invariant[A] extends Any
 trait HasContains[A] extends Any with Invariant[A] { def contains(x: A): Boolean }
 trait DirectLeaf[A] extends Any with Direct[A] with HasContains[A]
 
-final class PureIndexed[+A](size: Size, indexFn: Int => A) extends IndexedImpl[A](size) {
+final class PureIndexed[+A](size: Size, indexFn: Long => A) extends IndexedImpl[A](size) {
   def elemAt(index: Index): A = indexFn(index)
 }
 
@@ -45,11 +45,11 @@ object Direct {
   )
 
   /** Immutability (particularly of Arrays) is on the honor system. */
-  def pureArray[A](xs: Array[A]): Direct[A]                            = pure(Size(xs.length), xs apply _)
+  def pureArray[A](xs: Array[A]): Direct[A]                            = pure(Size(xs.length), i => xs apply i.toInt)
   def pure[Repr](xs: Repr)(implicit tc: DirectAccess[Repr]): Direct[tc.A] = pure(tc length xs, index => (tc elemAt xs)(index))
   def pure[A](size: Size, indexFn: Index => A): Direct[A]              = new PureIndexed(size, indexFn)
 
-  def fill[A](times: Int)(body: => A): Direct[A] = {
+  def fill[A](times: Long)(body: => A): Direct[A] = {
     val buf = Vector.newBuilder[A]
     Interval(0, times) foreach (_ => buf += body)
     pure(buf.result)
@@ -59,16 +59,4 @@ object Direct {
     case xs: WrappedArray[A] => pureArray(xs.array)
     case _                   => pure(xs.toVector)
   }
-}
-object IntRange {
-  def until(start: Int, end: Int): IntRange = if (end < start) until(start, start) else new IntRange(start, end - 1, isInclusive = false)
-  def to(start: Int, last: Int): IntRange   = if (last < start) until(start, start) else new IntRange(start, last, isInclusive = true)
-}
-
-final class IntRange private (val start: Int, val last: Int, isInclusive: Boolean) extends IndexedImpl[Int](Size(last - start + 1)) with DirectLeaf[Int] {
-  def contains(x: Int): Boolean = start <= x && x <= last
-  def isEmpty               = last < start
-  def end                   = last + 1
-  def elemAt(i: Index): Int = start + i
-  override def toString     = if (isInclusive) s"$start to $last" else s"$start until $end"
 }

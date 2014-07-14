@@ -6,16 +6,16 @@ import psp.core._
 final class CircularBuffer[A](capacity: Size) extends Foreach[A] {
   assert(!capacity.isZero, capacity)
 
-  private[this] val buffer  = new Array[Any](capacity.value)
+  private[this] val buffer  = new Array[Any](capacity.value.toInt)
   private[this] var pointer = 0
   private[this] var seen    = 0
   private[this] def current = bufferAt(pointer)
 
-  private[this] def bufferAt(i: Int): A                   = buffer(i).castTo[A]
-  private[this] def bufferUpdate(offset: Int, x: A): Unit = buffer(bufferIndex(offset)) = x
-  private[this] def bufferIndex(index: Int): Int          = (pointer + index) % capacity.value
+  private[this] def bufferAt(i: Long): A                  = buffer(i.toInt).castTo[A]
+  private[this] def bufferUpdate(offset: Int, x: A): Unit = buffer(bufferIndex(offset).toInt) = x
+  private[this] def bufferIndex(index: Long): Long        = (pointer + index) % capacity.value
 
-  private[this] def indices: Direct[Int] = if (isFull) size.toIndexed map bufferIndex force else size.toIndexed
+  private[this] def indices: Direct[Long] = if (isFull) size.toIndexed map bufferIndex force else size.toIndexed
   private[this] def andThis(op: Unit): this.type = this
   private[this] def intSize = size.value
 
@@ -36,7 +36,7 @@ final class CircularBuffer[A](capacity: Size) extends Foreach[A] {
   def += (x: A): this.type = andThis {
     bufferUpdate(0, x)
     seen += 1
-    pointer = bufferIndex(1)
+    pointer = bufferIndex(1).toInt
   }
 
   override def toString = s"CircularBuffer($size/$capacity)"

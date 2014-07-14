@@ -57,7 +57,7 @@ final class CompatSeq[A, Repr, CC[X]](val repr: Repr)(implicit val tc: DirectAcc
   private[this] def fail(msg: String): Nothing             = sys.error(msg)
 
   private[this] def pspSize: Size                                       = tc length repr
-  private[this] def intSize: Int                                        = pspSize.value
+  private[this] def intSize: Long                                       = pspSize.value
   private[this] def asIndexed: Direct[A]                                = Direct.pure(pspSize, idx => tc.elemAt(repr)(idx))
   private[this] def xsUp[A1 >: A] : Direct[A1]                          = xs
   private[this] implicit def wrap(xs: Repr): IndexedView[Repr, tc.type] = tc wrap xs
@@ -69,7 +69,7 @@ final class CompatSeq[A, Repr, CC[X]](val repr: Repr)(implicit val tc: DirectAcc
   def canEqual(that: Any): Boolean = that.isInstanceOf[GSeq[_]]
 
   // Members declared in sc.GenIterableLike
-  def reverseIterator: Iterator[A]                                                    = xs.size.reverseInterval.scalaIterator map apply
+  def reverseIterator: Iterator[A]                                                    = xs.size.reverseInterval.scalaIterator map (i => apply(i.toInt))
   def iterator: Iterator[A]                                                           = xs.scalaIterator
   def sameElements[A1 >: A](that: GIterable[A1]): Boolean                             = (iterator corresponds that.iterator)(_ == _)
   def zip[A1 >: A, B, That](that: GIterable[B])(implicit bf: CBF[(A1, B),That]): That = buildThat(iterator zip that.iterator)
@@ -85,7 +85,7 @@ final class CompatSeq[A, Repr, CC[X]](val repr: Repr)(implicit val tc: DirectAcc
     buf.result
   }
   def zipWithIndex[A1 >: A, That](implicit bf: CBF[(A1, Int),That]): That                            = buildThat(iterator zip (Iterator from 0))
-  def padTo[B >: A, That](len: Int, elem: B)(implicit bf: CBF[B, That]): That                        = (Builds wrap bf) build (iterator, Iterator.fill(len - intSize)(elem))
+  def padTo[B >: A, That](len: Int, elem: B)(implicit bf: CBF[B, That]): That                        = (Builds wrap bf) build (iterator, Iterator.fill(len - intSize.toInt)(elem))
   def patch[B >: A, That](from: Int, patch: GSeq[B], replaced: Int)(implicit bf: CBF[B, That]): That = buildThat(wrapGen(_ take from), patch.seq, wrapGen(_ drop from + replaced))
 
   // Members declared in sc.GenSeqLike
@@ -104,20 +104,20 @@ final class CompatSeq[A, Repr, CC[X]](val repr: Repr)(implicit val tc: DirectAcc
   }
 
   def endsWith[B](that: GSeq[B]): Boolean               = (this.size >= that.size) && ((xs takeRight that.size).toSeq sameElements that)
-  def indexWhere(p: Predicate[A],from: Int): Int        = xs.size.toIndexed drop from find (idx => p(apply(idx))) getOrElse NoIndex
+  def indexWhere(p: Predicate[A], from: Int): Int       = (xs.size.toIndexed drop from find (idx => p(apply(idx.toInt))) map (_.toInt) getOrElse NoIndex).toInt
   def intersect[B >: A](that: GSeq[B]): Repr            = buildNative(filter(that.toSet))
-  def lastIndexWhere(p: Predicate[A],end: Int): Int     = xs.size.reverseInterval drop (intSize - end) find (idx => p(apply(idx))) getOrElse NoIndex
-  def segmentLength(p: Predicate[A], from: Int): Int    = (this drop from takeWhile p).sizeInfo.preciseIntSize
+  def lastIndexWhere(p: Predicate[A],end: Int): Int     = (xs.size.reverseInterval drop (intSize - end).toInt find (idx => p(apply(idx.toInt))) map (_.toInt) getOrElse NoIndex.toInt)
+  def segmentLength(p: Predicate[A], from: Int): Int    = (this drop from takeWhile p).sizeInfo.preciseLongSize.toInt
   def startsWith[B](that: GSeq[B],offset: Int): Boolean = (this drop offset take that.size).trav.toIterator sameElements that.iterator
 
   def head: A                     = if (isEmpty) failEmpty("head") else apply(0)
-  def last: A                     = if (isEmpty) failEmpty("last") else apply(pspSize.lastIndex)
+  def last: A                     = if (isEmpty) failEmpty("last") else apply(pspSize.lastIndex.toInt)
   def tail: Repr                  = if (isEmpty) failEmpty("tail") else drop(1)
   def init: Repr                  = if (isEmpty) failEmpty("init") else dropRight(1)
   def headOption: Option[A]       = if (isEmpty) None else Some(head)
   def lastOption: Option[A]       = if (isEmpty) None else Some(last)
   def isTraversableAgain: Boolean = true
-  def length: Int                 = intSize
+  def length: Int                 = intSize.toInt
   def seq: Seq[A]                 = toSeq
   def size: Int                   = length
   def stringPrefix: String        = "Compat"
@@ -147,10 +147,10 @@ final class CompatSeq[A, Repr, CC[X]](val repr: Repr)(implicit val tc: DirectAcc
   def :\[B](z: B)(op: (A, B) => B): B                                          = xs.foldr(z)(op)
   def /:[B](z: B)(op: (B, A) => B): B                                          = xs.foldl(z)(op)
   def aggregate[B](z: => B)(seqop: (B, A) => B, combop: (B, B) => B): B        = xs.foldl(z)(seqop)
-  def copyToArray[B >: A](xs: Array[B],start: Int,len: Int): Unit              = this.xs.foreachWithIndex((x, i) => { xs(start + i) = x ; i >= len })
+  def copyToArray[B >: A](xs: Array[B],start: Int,len: Int): Unit              = this.xs.foreachWithIndex((x, i) => { xs(start + i.toInt) = x ; i >= len })
   def copyToArray[B >: A](xs: Array[B],start: Int): Unit                       = copyToArray[B](xs, start, xs.length - start)
   def copyToArray[B >: A](xs: Array[B]): Unit                                  = copyToArray[B](xs, 0, xs.length)
-  def count(p: Predicate[A]): Int                                              = filter(p).sizeInfo.preciseIntSize
+  def count(p: Predicate[A]): Int                                              = filter(p).sizeInfo.preciseLongSize.toInt
   def exists(pred: Predicate[A]): Boolean                                      = xs exists pred
   def find(pred: Predicate[A]): Option[A]                                      = xs find pred
   def fold[A1 >: A](z: A1)(op: (A1, A1) => A1): A1                             = xs.foldl(z)(op)
